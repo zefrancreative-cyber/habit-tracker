@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imperium Habit Tracker — Cloud Sapphire Edition</title>
+    <title>Imperium Habit Tracker — Multi-Color Cloud Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- SDKs de Firebase -->
@@ -687,18 +687,19 @@
 
                 <div class="categories-wrapper" id="categoriesContainer">
                     <div class="category-chip" style="border-color: #3b82f6; color: #93c5fd;" data-name="DISCIPLINA" data-color="#3b82f6" data-text="#93c5fd">DISCIPLINA <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
-                    <div class="category-chip" style="border-color: #64748b; color: #cbd5e1;" data-name="FÍSICO (AGILIS)" data-color="#64748b" data-text="#cbd5e1">FÍSICO (AGILIS) <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
-                    <div class="category-chip" style="border-color: #fbbf24; color: #fde047;" data-name="PRODUCTIVIDAD" data-color="#fbbf24" data-text="#fde047">PRODUCTIVIDAD <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
+                    <div class="category-chip" style="border-color: #10b981; color: #6ee7b7;" data-name="SALUD" data-color="#10b981" data-text="#6ee7b7">SALUD <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
+                    <div class="category-chip" style="border-color: #fbbf24; color: #fde047;" data-name="FINANZAS" data-color="#fbbf24" data-text="#fde047">FINANZAS <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
+                    <div class="category-chip" style="border-color: #8b5cf6; color: #c4b5fd;" data-name="MENTAL" data-color="#8b5cf6" data-text="#c4b5fd">MENTAL <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
                     
                     <div class="add-category-inline">
                         <input type="text" id="newCategoryInput" class="inline-input-category" placeholder="NUEVA META...">
                         <select id="newCategoryColor" class="inline-select-color">
                             <option value="#3b82f6,#93c5fd">Azul Zafiro</option>
-                            <option value="#1e40af,#60a5fa">Azul Imperial</option>
+                            <option value="#10b981,#6ee7b7">Esmeralda</option>
                             <option value="#fbbf24,#fde047">Dorado Real</option>
-                            <option value="#64748b,#cbd5e1">Gris Platino</option>
-                            <option value="#06b6d4,#67e8f9">Cian Cósmico</option>
-                            <option value="#8b5cf6,#c4b5fd">Amatista Real</option>
+                            <option value="#8b5cf6,#c4b5fd">Amatista</option>
+                            <option value="#ef4444,#fca5a5">Rubí</option>
+                            <option value="#64748b,#cbd5e1">Platino</option>
                         </select>
                         <button class="btn-inline-submit" onclick="addCategoryInline()">+ AÑADIR</button>
                     </div>
@@ -891,10 +892,10 @@
                 {
                     id: 2,
                     time: "10:00",
-                    name: "ENTRENAMIENTO JIU-JITSU",
-                    metaType: "FÍSICO (AGILIS)",
-                    borderColor: "#64748b",
-                    textColor: "#cbd5e1",
+                    name: "ENTRENAMIENTO FÍSICO",
+                    metaType: "SALUD",
+                    borderColor: "#10b981",
+                    textColor: "#6ee7b7",
                     active: [true, true, true, true, true, true, true],
                     checks: [false, false, false, false, false, false, false]
                 }
