@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imperium Habit Tracker — Sapphire Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #040812;
+            --surface-dark: #0b1326;
+            --surface-card: #101c38;
+            --border-primary: #1e3a8a;
+            --border-glow: rgba(30, 58, 138, 0.6);
+            --border-gold: #d4af37;
+            --border-subtle: #172554;
+            --accent-blue-bright: #3b82f6;
+            --accent-blue-neon: #60a5fa;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-gold: #fbbf24;
+            --font-roman: 'Cinzel', serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 0%, #0d1b3e 0%, #040812 70%);
+        }
+
+        .tracker-wrapper {
+            width: 100%;
+            max-width: 1350px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        @media (max-width: 960px) {
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .control-panel {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-primary);
+            border-radius: 14px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 40px rgba(4, 8, 18, 0.8), inset 0 0 20px rgba(59, 130, 246, 0.05);
+        }
+
+        .top-banner-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .roman-title-banner {
+            flex: 1;
+            font-family: var(--font-roman);
+            text-align: center;
+            background: linear-gradient(135deg, #0f172a 0%, #040812 100%);
+            border: 1px solid var(--border-gold);
+            color: var(--text-gold);
+            font-weight: 700;
+            padding: 12px;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            border-radius: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            min-width: 260px;
+        }
+
+        .calendar-picker-wrapper {
+            position: relative;
+            background: #0f172a;
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .calendar-input {
+            background: transparent;
+            border: none;
+            color: var(--accent-blue-neon);
+            font-family: var(--font-roman);
+            font-size: 0.75rem;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+            color-scheme: dark;
+        }
+
+        /* --- Panel de Metas en Línea --- */
+        .categories-wrapper {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            align-items: center;
+        }
+
+        .category-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: var(--font-roman);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+            border: 1px solid;
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .chip-delete {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .chip-delete:hover { opacity: 1; }
+
+        .add-category-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #0f172a;
+            border: 1px dashed var(--accent-blue-bright);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .inline-input-category {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: var(--font-roman);
+            font-size: 0.7rem;
+            outline: none;
+            width: 100px;
+            letter-spacing: 0.5px;
+        }
+        .inline-input-category::placeholder { color: var(--text-muted); }
+
+        .inline-select-color {
+            background: #040812;
+            border: 1px solid var(--border-primary);
+            color: var(--text-gold);
+            font-family: var(--font-roman);
+            font-size: 0.65rem;
+            padding: 4px 6px;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-inline-submit {
+            background: var(--accent-blue-bright);
+            color: #fff;
+            border: none;
+            font-family: var(--font-roman);
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-inline-submit:hover { background: var(--accent-blue-neon); }
+
+        /* Elite Rank Card */
+        .elite-rank-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-gold);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.15);
+            text-align: center;
+        }
+
+        .elite-header {
+            font-family: var(--font-roman);
+            color: var(--text-gold);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .elite-avatar-frame {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background: #040812;
+            border: 2px solid var(--border-gold);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 6px 0;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .elite-avatar-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .elite-title-rank {
+            font-family: var(--font-roman);
+            color: var(--text-main);
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+
+        .elite-progress-track {
+            width: 100%;
+            background: #040812;
+            border-radius: 6px;
+            height: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-primary);
+            position: relative;
+        }
+
+        .elite-progress-fill {
+            background: linear-gradient(90deg, #1d4ed8, #60a5fa);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .elite-progress-label {
+            font-family: var(--font-roman);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Main Table Container */
+        .table-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-primary);
+            border-radius: 14px;
+            overflow-x: auto;
+            box-shadow: 0 10px 40px rgba(4, 8, 18, 0.8);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 1000px;
+        }
+
+        th, td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        th {
+            background-color: #070e1e;
+            font-family: var(--font-roman);
+            color: var(--accent-blue-neon);
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        th.th-left { text-align: left; padding-left: 20px; }
+
+        .col-time { width: 110px; text-align: center; }
+        .col-habit { width: 240px; }
+        .col-meta { width: 140px; text-align: center; }
+        .col-day { width: 75px; text-align: center; }
+        .col-progress { width: 110px; text-align: center; }
+        .col-action { width: 45px; text-align: center; }
+
+        .inline-input-time {
+            background: #040812;
+            border: 1px solid var(--border-primary);
+            color: var(--text-muted);
+            font-family: monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 6px 8px;
+            border-radius: 6px;
+            width: 95px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .inline-input-time:focus { border-color: var(--accent-blue-neon); color: var(--text-main); }
+
+        .inline-input-habit {
+            background: #040812;
+            border: 1px solid var(--border-primary);
+            color: var(--text-main);
+            font-family: var(--font-roman);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 6px;
+            width: 100%;
+            outline: none;
+            letter-spacing: 0.5px;
+            transition: border-color 0.2s;
+        }
+        .inline-input-habit:focus { border-color: var(--accent-blue-neon); }
+
+        .inline-select-meta {
+            background: #040812;
+            border-radius: 6px;
+            font-family: var(--font-roman);
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+            padding: 6px 8px;
+            outline: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .day-box-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .day-title-roman {
+            font-family: var(--font-roman);
+            font-size: 9px;
+            color: var(--text-gold);
+            letter-spacing: 1px;
+        }
+
+        .day-name-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .cell-content-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .roman-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: #040812;
+            border: 1px solid var(--border-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .roman-checkbox:hover { border-color: var(--accent-blue-neon); }
+        .roman-checkbox:checked {
+            background-color: var(--accent-blue-bright);
+            border-color: var(--accent-blue-bright);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+        }
+        .roman-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .roman-checkbox:disabled {
+            background-color: #020408;
+            border-color: #0f172a;
+            cursor: not-allowed;
+            opacity: 0.3;
+        }
+
+        .day-switch-label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 9px;
+            font-family: var(--font-roman);
+            color: var(--text-muted);
+            gap: 3px;
+        }
+
+        .day-switch-input {
+            appearance: none;
+            width: 22px;
+            height: 12px;
+            background: #172554;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.2s;
+        }
+        .day-switch-input:checked { background: var(--accent-blue-bright); }
+        .day-switch-input::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            background: #fff;
+            transition: transform 0.2s;
+        }
+        .day-switch-input:checked::before { transform: translateX(10px); }
+
+        .row-progress-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .row-mini-bar {
+            width: 65px;
+            background: #040812;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border-primary);
+        }
+
+        .row-mini-fill {
+            background: linear-gradient(90deg, #1d4ed8, var(--accent-blue-neon));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .row-stats-text {
+            font-family: var(--font-roman);
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .rank-achieved-badge {
+            font-family: var(--font-roman);
+            font-size: 8px;
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue-neon);
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid var(--accent-blue-bright);
+            letter-spacing: 1px;
+        }
+
+        .btn-delete-row {
+            background: transparent;
+            border: none;
+            color: #f87171;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .btn-delete-row:hover { background: rgba(248, 113, 113, 0.15); }
+
+        .footer-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .btn-action {
+            font-family: var(--font-roman);
+            padding: 12px 24px;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reset {
+            background: var(--surface-dark);
+            color: var(--text-muted);
+            border-color: var(--border-primary);
+        }
+        .btn-reset:hover { border-color: var(--text-main); color: var(--text-main); }
+
+        .btn-primary-add {
+            background: var(--accent-blue-bright);
+            color: white;
+            border-color: var(--accent-blue-bright);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+        .btn-primary-add:hover { background: #2563eb; border-color: #2563eb; }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 960px) {
+            .reports-grid { grid-template-columns: 1fr; }
+        }
+
+        .report-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-primary);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(4, 8, 18, 0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .report-header {
+            font-family: var(--font-roman);
+            color: var(--text-gold);
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            text-align: center;
+            font-weight: 700;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .visual-report-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.01);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .visual-report-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-roman);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .visual-bar-track {
+            width: 100%;
+            background: #040812;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-primary);
+        }
+
+        .visual-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1d4ed8, var(--accent-blue-neon));
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 4px;
+        }
+
+        .vertical-chart-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 180px;
+            padding-top: 20px;
+            border-bottom: 2px solid var(--border-primary);
+            gap: 10px;
+        }
+
+        .v-bar-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .v-bar-fill-wrapper {
+            width: 30px;
+            background: #040812;
+            border-radius: 6px 6px 0 0;
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            border: 1px solid var(--border-primary);
+        }
+
+        .v-bar-fill {
+            width: 100%;
+            background: linear-gradient(180deg, #1d4ed8, var(--accent-blue-neon));
+            height: 0%;
+            transition: height 0.4s ease;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .v-bar-label {
+            font-family: var(--font-roman);
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .v-bar-value {
+            font-family: var(--font-roman);
+            font-size: 8px;
+            color: var(--accent-blue-neon);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tracker-wrapper">
+        <div class="header-grid">
+            <div class="control-panel">
+                <div class="top-banner-row">
+                    <div class="roman-title-banner" id="weekBanner">
+                        CARGANDO SEMANA...
+                    </div>
+                    <div class="calendar-picker-wrapper" title="Seleccionar fecha">
+                        <span>📅</span>
+                        <input type="date" class="calendar-input" id="calendarInput" onchange="onDateSelected(this.value)">
+                    </div>
+                </div>
+
+                <!-- Contenedor de Metas -->
+                <div class="categories-wrapper" id="categoriesContainer">
+                    <div class="category-chip" style="border-color: #3b82f6; color: #93c5fd;" data-name="DISCIPLINA" data-color="#3b82f6" data-text="#93c5fd">DISCIPLINA <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
+                    <div class="category-chip" style="border-color: #64748b; color: #cbd5e1;" data-name="FÍSICO (AGILIS)" data-color="#64748b" data-text="#cbd5e1">FÍSICO (AGILIS) <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
+                    <div class="category-chip" style="border-color: #fbbf24; color: #fde047;" data-name="PRODUCTIVIDAD" data-color="#fbbf24" data-text="#fde047">PRODUCTIVIDAD <button class="chip-delete" onclick="removeCategory(this)">✕</button></div>
+                    
+                    <!-- Formulario en línea con gama temática azul/zafiro y acentos de élite -->
+                    <div class="add-category-inline">
+                        <input type="text" id="newCategoryInput" class="inline-input-category" placeholder="NUEVA META...">
+                        <select id="newCategoryColor" class="inline-select-color">
+                            <option value="#3b82f6,#93c5fd">Azul Zafiro</option>
+                            <option value="#1e40af,#60a5fa">Azul Imperial</option>
+                            <option value="#fbbf24,#fde047">Dorado Real</option>
+                            <option value="#64748b,#cbd5e1">Gris Platino</option>
+                            <option value="#06b6d4,#67e8f9">Cian Cósmico</option>
+                            <option value="#8b5cf6,#c4b5fd">Amatista Real</option>
+                        </select>
+                        <button class="btn-inline-submit" onclick="addCategoryInline()">+ AÑADIR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="elite-rank-card">
+                <div class="elite-header">NIVEL DE CAMPEÓN</div>
+                <div class="elite-avatar-frame">
+                    <img id="rankAvatarImg" src="nivel1.png" alt="Nivel Campeón" onerror="this.src=''">
+                </div>
+                <div class="elite-title-rank" id="rankTitle">NIVEL 1</div>
+                <div style="width: 100%;">
+                    <div class="elite-progress-track">
+                        <div class="elite-progress-fill" id="globalProgressFill"></div>
+                    </div>
+                    <div class="elite-progress-label" id="globalProgressText">NIVEL 1 (0%)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="th-left col-time">HORA</th>
+                        <th class="th-left col-habit">HÁBITOS DE CAMPEÓN</th>
+                        <th class="col-meta">META</th>
+                        <th class="col-day"><div class="day-box-header"><span class="day-title-roman">VOTA VITA</span><span class="day-name-sub" id="lbl-0">LUN</span></div></th>
+                        <th class="col-day"><div class="day-box-header"><span class="day-title-roman">VOTA VITA</span><span class="day-name-sub" id="lbl-1">MAR</span></div></th>
+                        <th class="col-day"><div class="day-box-header"><span class="day-title-roman">VOTA VITA</span><span class="day-name-sub" id="lbl-2">MIE</span></div></th>
+                        <th class="col-day"><div class="day-box-header"><span class="day-title-roman">VOTA VITA</span><span class="day-name-sub" id="lbl-3">JUE</span></div></th>
+                        <th class="col-day"><div class="day-box-header"><span class="day-title-roman">VOTA VITA</span><span class="day-name-sub" id="lbl-4">VIE</span></div></th>
+                        <th class="col-day"><div class="day-box-header"><span class="day-title-roman">VOTA VITA</span><span class="day-name-sub" id="lbl-5">SÁB</span></div></th>
+                        <th class="col-day"><div class="day-box-header"><span class="day-title-roman">VOTA VITA</span><span class="day-name-sub" id="lbl-6">DOM</span></div></th>
+                        <th class="col-progress">PROGRESO</th>
+                        <th class="col-action">✕</th>
+                    </tr>
+                </thead>
+                <tbody id="habitsTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="footer-actions">
+            <button class="btn-action btn-reset" onclick="resetChecks()">REINICIAR CHECKS ↺</button>
+            <button class="btn-action btn-primary-add" onclick="addHabit()">+ AÑADIR NUEVO DESAFÍO</button>
+        </div>
+
+        <!-- Secciones de Reportes Semanales -->
+        <div class="reports-grid">
+            <div class="report-card">
+                <div class="report-header">RANKING DE HÁBITOS 🏅</div>
+                <div id="habitsRankingList"></div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-header">DÍAS MÁS PRODUCTIVOS 📅</div>
+                <div class="vertical-chart-container" id="daysProductivityChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const monthsNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+        let currentWeekKey = "";
+        let weeksData = {};
+
+        function getWeekKey(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return `${d.getUTCFullYear()}-W${weekNo}`;
+        }
+
+        function getMondayOfWeek(date) {
+            const dayOfWeek = date.getDay();
+            const distanceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            const monday = new Date(date);
+            monday.setDate(date.getDate() + distanceToMonday);
+            monday.setHours(0,0,0,0);
+            return monday;
+        }
+
+        function findLatestHabitsBefore(targetWeekKey) {
+            const sortedKeys = Object.keys(weeksData).sort();
+            let lastValidKey = null;
+            for (let key of sortedKeys) {
+                if (key < targetWeekKey) {
+                    lastValidKey = key;
+                } else {
+                    break;
+                }
+            }
+            if (lastValidKey && weeksData[lastValidKey]) {
+                return weeksData[lastValidKey].map(h => ({
+                    ...h,
+                    checks: [false, false, false, false, false, false, false]
+                }));
+            }
+            return null;
+        }
+
+        function getDefaultHabits() {
+            return [
+                {
+                    id: 1,
+                    time: "07:00 AM",
+                    name: "LEER 30 PÁGINAS",
+                    metaType: "DISCIPLINA",
+                    borderColor: "#3b82f6",
+                    textColor: "#93c5fd",
+                    active: [true, true, true, true, true, true, true],
+                    checks: [false, false, false, false, false, false, false]
+                },
+                {
+                    id: 2,
+                    time: "10:00 AM",
+                    name: "ENTRENAMIENTO JIU-JITSU",
+                    metaType: "FÍSICO (AGILIS)",
+                    borderColor: "#64748b",
+                    textColor: "#cbd5e1",
+                    active: [true, true, true, true, true, true, true],
+                    checks: [false, false, false, false, false, false, false]
+                }
+            ];
+        }
+
+        function getActiveWeekHabits() {
+            if (!weeksData[currentWeekKey]) {
+                const inherited = findLatestHabitsBefore(currentWeekKey);
+                if (inherited) {
+                    weeksData[currentWeekKey] = JSON.parse(JSON.stringify(inherited));
+                } else {
+                    weeksData[currentWeekKey] = getDefaultHabits();
+                }
+            }
+            return weeksData[currentWeekKey];
+        }
+
+        function propagateHabitsToFuture(targetWeekKey, newHabitsList) {
+            const sortedKeys = Object.keys(weeksData).sort();
+            for (let key of sortedKeys) {
+                if (key > targetWeekKey) {
+                    let futureHabits = weeksData[key];
+                    let updatedFuture = newHabitsList.map(baseHabit => {
+                        let existing = futureHabits.find(fh => fh.name === baseHabit.name && fh.time === baseHabit.time);
+                        if (existing) {
+                            return existing;
+                        } else {
+                            return {
+                                ...baseHabit,
+                                checks: [false, false, false, false, false, false, false]
+                            };
+                        }
+                    });
+                    weeksData[key] = updatedFuture;
+                }
+            }
+        }
+
+        function onDateSelected(dateString) {
+            if (!dateString) return;
+            const selectedDate = new Date(dateString + 'T00:00:00');
+            currentWeekKey = getWeekKey(selectedDate);
+            updateViewByCurrentWeek(selectedDate);
+        }
+
+        function updateViewByCurrentWeek(dateInWeek) {
+            const monday = getMondayOfWeek(dateInWeek);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const monStr = `${monday.getDate()} ${monthsNames[monday.getMonth()]}`;
+            const sunStr = `${sunday.getDate()} ${monthsNames[sunday.getMonth()]}`;
+            document.getElementById('weekBanner').innerText = `SEMANA: LUN ${monStr} — DOM ${sunStr} ${sunday.getFullYear()}`;
+
+            const dayNamesShort = ["LUN", "MAR", "MIE", "JUE", "VIE", "SÁB", "DOM"];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                document.getElementById(`lbl-${i}`).innerText = `${dayNamesShort[i]} ${d.getDate()}`;
+            }
+
+            renderTable();
+        }
+
+        function getAvailableCategories() {
+            const chips = document.querySelectorAll('#categoriesContainer .category-chip');
+            let categories = [];
+            chips.forEach(chip => {
+                const name = chip.getAttribute('data-name');
+                const borderColor = chip.getAttribute('data-color');
+                const textColor = chip.getAttribute('data-text');
+                categories.push({ name, borderColor, textColor });
+            });
+            return categories;
+        }
+
+        function renderTable() {
+            const habits = getActiveWeekHabits();
+            const tbody = document.getElementById('habitsTableBody');
+            tbody.innerHTML = '';
+
+            let totalPossible = 0;
+            let totalChecked = 0;
+            let dayCompletedCount = [0, 0, 0, 0, 0, 0, 0];
+            let dayActiveCount = [0, 0, 0, 0, 0, 0, 0];
+            let habitStats = [];
+
+            const categories = getAvailableCategories();
+
+            habits.forEach((habit, hIndex) => {
+                const tr = document.createElement('tr');
+
+                const tdTime = document.createElement('td');
+                tdTime.className = 'col-time';
+                const timeInput = document.createElement('input');
+                timeInput.type = 'text';
+                timeInput.className = 'inline-input-time';
+                timeInput.value = habit.time;
+                timeInput.onchange = (e) => {
+                    habits[hIndex].time = e.target.value;
+                };
+                tdTime.appendChild(timeInput);
+                tr.appendChild(tdTime);
+
+                const tdName = document.createElement('td');
+                tdName.className = 'col-habit';
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.className = 'inline-input-habit';
+                nameInput.value = habit.name;
+                nameInput.onchange = (e) => {
+                    habits[hIndex].name = e.target.value.toUpperCase();
+                    renderTable();
+                };
+                tdName.appendChild(nameInput);
+                tr.appendChild(tdName);
+
+                const tdMeta = document.createElement('td');
+                tdMeta.className = 'col-meta';
+                const metaSelect = document.createElement('select');
+                metaSelect.className = 'inline-select-meta';
+                metaSelect.style.borderColor = habit.borderColor;
+                metaSelect.style.color = habit.textColor;
+                metaSelect.style.backgroundColor = 'rgba(4,8,18,0.8)';
+
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.name;
+                    opt.innerText = cat.name;
+                    opt.style.backgroundColor = '#0b1326';
+                    opt.style.color = cat.textColor;
+                    if (cat.name === habit.metaType) {
+                        opt.selected = true;
+                    }
+                    metaSelect.appendChild(opt);
+                });
+
+                metaSelect.onchange = (e) => {
+                    const selectedCatName = e.target.value;
+                    const foundCat = categories.find(c => c.name === selectedCatName);
+                    if (foundCat) {
+                        habits[hIndex].metaType = foundCat.name;
+                        habits[hIndex].borderColor = foundCat.borderColor;
+                        habits[hIndex].textColor = foundCat.textColor;
+                        metaSelect.style.borderColor = foundCat.borderColor;
+                        metaSelect.style.color = foundCat.textColor;
+                        renderTable();
+                    }
+                };
+
+                tdMeta.appendChild(metaSelect);
+                tr.appendChild(tdMeta);
+
+                let habitPossible = 0;
+                let habitChecked = 0;
+
+                for (let d = 0; d < 7; d++) {
+                    const tdDay = document.createElement('td');
+                    tdDay.className = 'col-day';
+                    const container = document.createElement('div');
+                    container.className = 'cell-content-group';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'roman-checkbox';
+                    checkbox.checked = habit.checks[d];
+                    checkbox.disabled = !habit.active[d];
+
+                    if (habit.active[d]) {
+                        habitPossible++;
+                        totalPossible++;
+                        dayActiveCount[d]++;
+                        if (checkbox.checked) {
+                            habitChecked++;
+                            totalChecked++;
+                            dayCompletedCount[d]++;
+                        }
+                    }
+
+                    checkbox.onchange = (e) => {
+                        habits[hIndex].checks[d] = e.target.checked;
+                        renderTable();
+                    };
+
+                    const labelSwitch = document.createElement('label');
+                    labelSwitch.className = 'day-switch-label';
+                    const switchInput = document.createElement('input');
+                    switchInput.type = 'checkbox';
+                    switchInput.className = 'day-switch-input';
+                    switchInput.checked = habit.active[d];
+                    
+                    switchInput.onchange = (e) => {
+                        habits[hIndex].active[d] = e.target.checked;
+                        if (!e.target.checked) {
+                            habits[hIndex].checks[d] = false;
+                        }
+                        renderTable();
+                    };
+
+                    labelSwitch.appendChild(switchInput);
+                    container.appendChild(checkbox);
+                    container.appendChild(labelSwitch);
+                    tdDay.appendChild(container);
+                    tr.appendChild(tdDay);
+                }
+
+                let percent = habitPossible > 0 ? Math.round((habitChecked / habitPossible) * 100) : 0;
+                habitStats.push({
+                    name: habit.name,
+                    metaType: habit.metaType,
+                    borderColor: habit.borderColor,
+                    textColor: habit.textColor,
+                    percent: percent
+                });
+
+                const tdProg = document.createElement('td');
+                tdProg.className = 'col-progress';
+                const progWrapper = document.createElement('div');
+                progWrapper.className = 'row-progress-wrapper';
+
+                const bar = document.createElement('div');
+                bar.className = 'row-mini-bar';
+                const fill = document.createElement('div');
+                fill.className = 'row-mini-fill';
+                fill.style.width = `${percent}%`;
+                bar.appendChild(fill);
+
+                const stats = document.createElement('span');
+                stats.className = 'row-stats-text';
+                stats.innerText = `${percent}%`;
+
+                progWrapper.appendChild(bar);
+                progWrapper.appendChild(stats);
+
+                if (percent === 100 && habitPossible > 0) {
+                    const rankBadge = document.createElement('span');
+                    rankBadge.className = 'rank-achieved-badge';
+                    rankBadge.innerText = 'EL MATADOR';
+                    progWrapper.appendChild(rankBadge);
+                }
+
+                tdProg.appendChild(progWrapper);
+                tr.appendChild(tdProg);
+
+                const tdAction = document.createElement('td');
+                tdAction.className = 'col-action';
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-delete-row';
+                deleteBtn.innerText = '✕';
+                deleteBtn.title = 'Eliminar desafío';
+                deleteBtn.onclick = () => {
+                    habits.splice(hIndex, 1);
+                    propagateHabitsToFuture(currentWeekKey, habits);
+                    renderTable();
+                };
+                tdAction.appendChild(deleteBtn);
+                tr.appendChild(tdAction);
+
+                tbody.appendChild(tr);
+            });
+
+            // Barra Global y Niveles (6 Niveles)
+            let globalPercent = totalPossible > 0 ? Math.round((totalChecked / totalPossible) * 100) : 0;
+            document.getElementById('globalProgressFill').style.width = `${globalPercent}%`;
+
+            let currentLevel = 1;
+            let rankName = "NIVEL 1";
+
+            if (globalPercent === 100 && totalPossible > 0) {
+                currentLevel = 6;
+                rankName = "BMF CHAMPION 🏆";
+            } else if (globalPercent > 83) {
+                currentLevel = 6;
+                rankName = "NIVEL 6";
+            } else if (globalPercent > 66) {
+                currentLevel = 5;
+                rankName = "NIVEL 5";
+            } else if (globalPercent > 50) {
+                currentLevel = 4;
+                rankName = "NIVEL 4";
+            } else if (globalPercent > 33) {
+                currentLevel = 3;
+                rankName = "NIVEL 3";
+            } else if (globalPercent > 16) {
+                currentLevel = 2;
+                rankName = "NIVEL 2";
+            } else {
+                currentLevel = 1;
+                rankName = "NIVEL 1";
+            }
+
+            document.getElementById('rankTitle').innerText = rankName;
+            document.getElementById('rankAvatarImg').src = `nivel${currentLevel}.png`;
+            document.getElementById('globalProgressText').innerText = `NIVEL ${currentLevel} (${globalPercent}%)`;
+
+            renderVisualReports(habitStats, dayCompletedCount, dayActiveCount);
+        }
+
+        function renderVisualReports(habitStats, dayCompletedCount, dayActiveCount) {
+            habitStats.sort((a, b) => b.percent - a.percent);
+            const rankingContainer = document.getElementById('habitsRankingList');
+            rankingContainer.innerHTML = '';
+
+            if (habitStats.length === 0) {
+                rankingContainer.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:10px; font-size:0.8rem;">No hay hábitos registrados</div>';
+            } else {
+                habitStats.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'visual-report-item';
+                    div.innerHTML = `
+                        <div class="visual-report-info">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="color:var(--text-main);">${item.name}</span>
+                                <span class="meta-badge" style="border-color:${item.borderColor}; color:${item.textColor}; font-size:0.55rem; padding:2px 6px;">${item.metaType}</span>
+                            </div>
+                            <span style="color:var(--accent-blue-neon);">${item.percent}%</span>
+                        </div>
+                        <div class="visual-bar-track">
+                            <div class="visual-bar-fill" style="width: ${item.percent}%;"></div>
+                        </div>
+                    `;
+                    rankingContainer.appendChild(div);
+                });
+            }
+
+            const dayNames = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
+            const chartContainer = document.getElementById('daysProductivityChart');
+            chartContainer.innerHTML = '';
+
+            for (let i = 0; i < 7; i++) {
+                let active = dayActiveCount[i];
+                let completed = dayCompletedCount[i];
+                let pct = active > 0 ? Math.round((completed / active) * 100) : 0;
+
+                const col = document.createElement('div');
+                col.className = 'v-bar-column';
+                col.innerHTML = `
+                    <div class="v-bar-value">${pct}%</div>
+                    <div class="v-bar-fill-wrapper">
+                        <div class="v-bar-fill" style="height: ${pct}%;"></div>
+                    </div>
+                    <div class="v-bar-label">${dayNames[i]}</div>
+                `;
+                chartContainer.appendChild(col);
+            }
+        }
+
+        function resetChecks() {
+            const habits = getActiveWeekHabits();
+            habits.forEach(h => {
+                h.checks = [false, false, false, false, false, false, false];
+            });
+            renderTable();
+        }
+
+        function addHabit() {
+            const time = prompt("Hora del desafío (Ej: 06:00 PM):", "08:00 PM");
+            if (!time) return;
+            const name = prompt("Nombre del hábito épico:", "MEDITACIÓN PROFUNDA");
+            if (!name) return;
+
+            const categories = getAvailableCategories();
+            if (categories.length === 0) {
+                alert("Primero debes crear al menos una categoría/meta.");
+                return;
+            }
+
+            let catOptionsText = categories.map((c, index) => `${index + 1}. ${c.name}`).join('\n');
+            let selection = prompt(`Selecciona el número de la categoría/meta:\n${catOptionsText}`, "1");
+            
+            if (selection === null) return;
+            let selectedIndex = parseInt(selection) - 1;
+            let chosenCategory = categories[selectedIndex] || categories[0];
+
+            const habits = getActiveWeekHabits();
+            habits.push({
+                id: Date.now(),
+                time: time,
+                name: name.toUpperCase(),
+                metaType: chosenCategory.name,
+                borderColor: chosenCategory.borderColor,
+                textColor: chosenCategory.textColor,
+                active: [true, true, true, true, true, true, true],
+                checks: [false, false, false, false, false, false, false]
+            });
+            
+            propagateHabitsToFuture(currentWeekKey, habits);
+            renderTable();
+        }
+
+        function addCategoryInline() {
+            const input = document.getElementById('newCategoryInput');
+            const colorSelect = document.getElementById('newCategoryColor');
+            
+            const catName = input.value.trim().toUpperCase();
+            if (!catName) {
+                alert("Por favor escribe el nombre de la meta.");
+                return;
+            }
+
+            const [borderColor, textColor] = colorSelect.value.split(',');
+
+            const container = document.getElementById('categoriesContainer');
+            const newChip = document.createElement('div');
+            newChip.className = 'category-chip';
+            newChip.style.borderColor = borderColor;
+            newChip.style.color = textColor;
+            newChip.setAttribute('data-name', catName);
+            newChip.setAttribute('data-color', borderColor);
+            newChip.setAttribute('data-text', textColor);
+            newChip.innerHTML = `${catName} <button class="chip-delete" onclick="removeCategory(this)">✕</button>`;
+            
+            const inlineBox = document.querySelector('.add-category-inline');
+            container.insertBefore(newChip, inlineBox);
+
+            input.value = '';
+            renderTable();
+        }
+
+        function removeCategory(btn) {
+            btn.parentElement.remove();
+            renderTable();
+        }
+
+        // Inicialización con la fecha actual del sistema
+        const today = new Date();
+        currentWeekKey = getWeekKey(today);
+        document.getElementById('calendarInput').value = today.toISOString().split('T')[0];
+        updateViewByCurrentWeek(today);
+    </script>
+</body>
+</html>
