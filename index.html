@@ -327,9 +327,11 @@
             font-weight: 600;
             padding: 6px 8px;
             border-radius: 6px;
-            width: 95px;
+            width: 105px;
             text-align: center;
             outline: none;
+            cursor: pointer;
+            color-scheme: dark;
             transition: border-color 0.2s;
         }
         .inline-input-time:focus { border-color: var(--accent-blue-neon); color: var(--text-main); }
@@ -772,7 +774,6 @@
         let customCategories = [];
         let isCloudLoaded = false;
 
-        // Carga inicial y escucha permanente en tiempo real
         function initCloudSync() {
             db.ref('tracker_data').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -848,6 +849,14 @@
             return monday;
         }
 
+        function sortHabitsByTime(habitsList) {
+            habitsList.sort((a, b) => {
+                let timeA = a.time || "00:00";
+                let timeB = b.time || "00:00";
+                return timeA.localeCompare(timeB);
+            });
+        }
+
         function findLatestHabitsBefore(targetWeekKey) {
             const sortedKeys = Object.keys(weeksData).sort();
             let lastValidKey = null;
@@ -871,7 +880,7 @@
             return [
                 {
                     id: 1,
-                    time: "07:00 AM",
+                    time: "07:00",
                     name: "LEER 30 PÁGINAS",
                     metaType: "DISCIPLINA",
                     borderColor: "#3b82f6",
@@ -881,7 +890,7 @@
                 },
                 {
                     id: 2,
-                    time: "10:00 AM",
+                    time: "10:00",
                     name: "ENTRENAMIENTO JIU-JITSU",
                     metaType: "FÍSICO (AGILIS)",
                     borderColor: "#64748b",
@@ -900,6 +909,7 @@
                 } else {
                     weeksData[currentWeekKey] = getDefaultHabits();
                 }
+                sortHabitsByTime(weeksData[currentWeekKey]);
                 saveToCloud();
             }
             return weeksData[currentWeekKey];
@@ -911,7 +921,7 @@
                 if (key > targetWeekKey) {
                     let futureHabits = weeksData[key];
                     let updatedFuture = newHabitsList.map(baseHabit => {
-                        let existing = futureHabits.find(fh => fh.name === baseHabit.name && fh.time === baseHabit.time);
+                        let existing = futureHabits.find(fh => fh.name === baseHabit.name);
                         if (existing) {
                             return existing;
                         } else {
@@ -921,7 +931,25 @@
                             };
                         }
                     });
+                    sortHabitsByTime(updatedFuture);
                     weeksData[key] = updatedFuture;
+                }
+            }
+            saveToCloud();
+        }
+
+        function propagateActiveDayToFuture(dayIndex, isActive) {
+            const sortedKeys = Object.keys(weeksData).sort();
+            for (let key of sortedKeys) {
+                if (key >= currentWeekKey) {
+                    if (weeksData[key]) {
+                        weeksData[key].forEach(habit => {
+                            habit.active[dayIndex] = isActive;
+                            if (!isActive) {
+                                habit.checks[dayIndex] = false;
+                            }
+                        });
+                    }
                 }
             }
             saveToCloud();
@@ -968,6 +996,7 @@
         function renderTable() {
             if (!isCloudLoaded) return;
             const habits = getActiveWeekHabits();
+            sortHabitsByTime(habits);
             const tbody = document.getElementById('habitsTableBody');
             tbody.innerHTML = '';
 
@@ -985,12 +1014,15 @@
                 const tdTime = document.createElement('td');
                 tdTime.className = 'col-time';
                 const timeInput = document.createElement('input');
-                timeInput.type = 'text';
+                timeInput.type = 'time';
                 timeInput.className = 'inline-input-time';
-                timeInput.value = habit.time;
+                timeInput.value = habit.time || "00:00";
                 timeInput.onchange = (e) => {
                     habits[hIndex].time = e.target.value;
+                    sortHabitsByTime(habits);
+                    propagateHabitsToFuture(currentWeekKey, habits);
                     saveToCloud();
+                    renderTable();
                 };
                 tdTime.appendChild(timeInput);
                 tr.appendChild(tdTime);
@@ -1003,6 +1035,7 @@
                 nameInput.value = habit.name;
                 nameInput.onchange = (e) => {
                     habits[hIndex].name = e.target.value.toUpperCase();
+                    propagateHabitsToFuture(currentWeekKey, habits);
                     saveToCloud();
                     renderTable();
                 };
@@ -1086,11 +1119,8 @@
                     switchInput.checked = habit.active[d];
                     
                     switchInput.onchange = (e) => {
-                        habits[hIndex].active[d] = e.target.checked;
-                        if (!e.target.checked) {
-                            habits[hIndex].checks[d] = false;
-                        }
-                        saveToCloud();
+                        const isActive = e.target.checked;
+                        propagateActiveDayToFuture(d, isActive);
                         renderTable();
                     };
 
@@ -1252,7 +1282,7 @@
         }
 
         function addHabit() {
-            const time = prompt("Hora del desafío (Ej: 06:00 PM):", "08:00 PM");
+            let time = prompt("Selecciona o escribe la hora del desafío (Ej: 08:00):", "08:00");
             if (!time) return;
             const name = prompt("Nombre del hábito épico:", "MEDITACIÓN PROFUNDA");
             if (!name) return;
@@ -1282,6 +1312,7 @@
                 checks: [false, false, false, false, false, false, false]
             });
             
+            sortHabitsByTime(habits);
             propagateHabitsToFuture(currentWeekKey, habits);
             saveToCloud();
             renderTable();
