@@ -909,6 +909,25 @@
             saveToCloud();
         }
 
+        function propagateActiveStatusToFuture(habitName, dayIndex, isActive) {
+            const sortedKeys = Object.keys(weeksData).sort();
+            for (let key of sortedKeys) {
+                if (key >= currentWeekKey) {
+                    if (weeksData[key]) {
+                        weeksData[key].forEach(habit => {
+                            if (habit.name === habitName) {
+                                habit.active[dayIndex] = isActive;
+                                if (!isActive) {
+                                    habit.checks[dayIndex] = false;
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            saveToCloud();
+        }
+
         function onDateSelected(dateString) {
             if (!dateString) return;
             const selectedDate = new Date(dateString + 'T00:00:00');
@@ -1074,11 +1093,7 @@
                     
                     switchInput.onchange = (e) => {
                         const isActive = e.target.checked;
-                        habits[hIndex].active[d] = isActive;
-                        if (!isActive) {
-                            habits[hIndex].checks[d] = false;
-                        }
-                        saveToCloud();
+                        propagateActiveStatusToFuture(habit.name, d, isActive);
                         renderTable();
                     };
 
