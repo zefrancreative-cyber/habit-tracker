@@ -6,7 +6,7 @@
     <title>Imperium Habit Tracker — Cloud Sapphire Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SDKs de Firebase para la sincronización en la nube 24/7 -->
+    <!-- SDKs de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -760,7 +760,6 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE (Conectado a tu proyecto imperium-tracker)
         const firebaseConfig = {
             databaseURL: "https://imperium-tracker-default-rtdb.firebaseio.com"
         };
@@ -771,11 +770,11 @@
         let currentWeekKey = "";
         let weeksData = {};
         let customCategories = [];
-        let isSyncing = false;
+        let isCloudLoaded = false;
 
+        // Carga inicial y escucha permanente en tiempo real
         function initCloudSync() {
             db.ref('tracker_data').on('value', (snapshot) => {
-                if (isSyncing) return;
                 const data = snapshot.val();
                 if (data) {
                     if (data.weeksData) weeksData = data.weeksData;
@@ -783,13 +782,16 @@
                         customCategories = data.customCategories;
                         renderCustomCategories();
                     }
+                }
+                isCloudLoaded = true;
+                if (currentWeekKey) {
                     renderTable();
                 }
             });
         }
 
         function saveToCloud() {
-            isSyncing = true;
+            if (!isCloudLoaded) return;
             
             const chips = document.querySelectorAll('#categoriesContainer .category-chip');
             let cats = [];
@@ -805,13 +807,10 @@
             db.ref('tracker_data').set({
                 weeksData: weeksData,
                 customCategories: customCategories
-            }, () => {
-                isSyncing = false;
             });
         }
 
         function renderCustomCategories() {
-            if (customCategories.length === 0) return;
             const container = document.getElementById('categoriesContainer');
             const existingChips = container.querySelectorAll('.category-chip');
             existingChips.forEach(c => c.remove());
@@ -967,6 +966,7 @@
         }
 
         function renderTable() {
+            if (!isCloudLoaded) return;
             const habits = getActiveWeekHabits();
             const tbody = document.getElementById('habitsTableBody');
             tbody.innerHTML = '';
@@ -1157,7 +1157,6 @@
                 tbody.appendChild(tr);
             });
 
-            // Barra Global y Niveles (6 Niveles)
             let globalPercent = totalPossible > 0 ? Math.round((totalChecked / totalPossible) * 100) : 0;
             document.getElementById('globalProgressFill').style.width = `${globalPercent}%`;
 
@@ -1321,9 +1320,9 @@
         function removeCategory(btn) {
             btn.parentElement.remove();
             saveToCloud();
+            renderTable();
         }
 
-        // Inicialización y sincronización en la nube al abrir la app
         const today = new Date();
         currentWeekKey = getWeekKey(today);
         document.getElementById('calendarInput').value = today.toISOString().split('T')[0];
