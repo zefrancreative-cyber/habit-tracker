@@ -760,9 +760,9 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE (Base de datos en la nube gratuita 24/7)
+        // CONFIGURACIÓN DE FIREBASE (Conectado a tu proyecto imperium-tracker)
         const firebaseConfig = {
-            databaseURL: "https://imperium-tracker-default-rtdb.firebaseio.com/"
+            databaseURL: "https://imperium-tracker-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -771,9 +771,8 @@
         let currentWeekKey = "";
         let weeksData = {};
         let customCategories = [];
-        let isSyncing = false; // Bandera para evitar bucles de lectura/escritura
+        let isSyncing = false;
 
-        // Escuchar cambios en tiempo real desde la nube (Firebase Realtime Database)
         function initCloudSync() {
             db.ref('tracker_data').on('value', (snapshot) => {
                 if (isSyncing) return;
@@ -789,7 +788,6 @@
             });
         }
 
-        // Guardar datos instantáneamente en la nube
         function saveToCloud() {
             isSyncing = true;
             
@@ -1323,7 +1321,6 @@
         function removeCategory(btn) {
             btn.parentElement.remove();
             saveToCloud();
-            renderTable();
         }
 
         // Inicialización y sincronización en la nube al abrir la app
