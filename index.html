@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imperium Habit Tracker — Sapphire Edition</title>
+    <title>Imperium Habit Tracker — Elite Sapphire Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- SDKs de Firebase -->
@@ -249,8 +249,8 @@
             font-family: var(--font-roman);
             color: var(--text-main);
             font-weight: 900;
-            font-size: 0.95rem;
-            letter-spacing: 1.5px;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
             margin-bottom: 8px;
         }
 
@@ -297,6 +297,7 @@
         th, td {
             padding: 16px 12px;
             border-bottom: 1px solid var(--border-subtle);
+            vertical-align: middle;
         }
 
         th {
@@ -312,9 +313,9 @@
         th.th-left { text-align: left; padding-left: 20px; }
 
         .col-time { width: 110px; text-align: center; }
-        .col-habit { width: 240px; }
+        .col-habit { width: 280px; min-width: 250px; }
         .col-meta { width: 140px; text-align: center; }
-        .col-day { width: 75px; text-align: center; }
+        .col-day { width: 85px; text-align: center; }
         .col-progress { width: 110px; text-align: center; }
         .col-action { width: 45px; text-align: center; }
 
@@ -368,6 +369,8 @@
             flex-direction: column;
             align-items: center;
             gap: 2px;
+            min-height: 40px;
+            justify-content: flex-start;
         }
 
         .day-title-roman {
@@ -384,15 +387,15 @@
         }
 
         .day-conquest-badge {
-            font-size: 8px;
+            font-size: 7px;
             font-family: var(--font-roman);
             color: var(--text-gold);
             background: rgba(212, 175, 55, 0.15);
             border: 1px solid var(--border-gold);
-            padding: 2px 4px;
-            border-radius: 4px;
-            margin-top: 3px;
-            letter-spacing: 0.5px;
+            padding: 2px 3px;
+            border-radius: 3px;
+            margin-top: 2px;
+            letter-spacing: 0.2px;
             white-space: nowrap;
         }
 
@@ -717,16 +720,16 @@
             </div>
 
             <div class="elite-rank-card">
-                <div class="elite-header">NIVEL DE CAMPEÓN</div>
+                <div class="elite-header">ESTADO DE EVOLUCIÓN</div>
                 <div class="elite-avatar-frame">
-                    <img id="rankAvatarImg" src="nivel1.png" alt="Nivel Campeón" onerror="this.src=''">
+                    <img id="rankAvatarImg" src="nivel1.png" alt="Rango de Evolución" onerror="this.src=''">
                 </div>
-                <div class="elite-title-rank" id="rankTitle">NIVEL 1</div>
+                <div class="elite-title-rank" id="rankTitle">INICIADO</div>
                 <div style="width: 100%;">
                     <div class="elite-progress-track">
                         <div class="elite-progress-fill" id="globalProgressFill"></div>
                     </div>
-                    <div class="elite-progress-label" id="globalProgressText">NIVEL 1 (0%)</div>
+                    <div class="elite-progress-label" id="globalProgressText">INICIADO (0%)</div>
                 </div>
             </div>
         </div>
@@ -1188,42 +1191,42 @@
             document.getElementById('globalProgressFill').style.width = `${globalPercent}%`;
 
             let currentLevel = 1;
-            let rankName = "NIVEL 1";
+            let rankName = "INICIADO";
             let avatarImg = "nivel1.png";
 
             if (globalPercent === 100 && totalPossible > 0) {
                 currentLevel = 6;
                 rankName = "BMF CHAMPION 🏆";
-                avatarImg = "nivel6.png"; // Cambio automático a imagen 6 al completar el 100%
+                avatarImg = "nivel6.png";
             } else if (globalPercent > 83) {
                 currentLevel = 6;
-                rankName = "NIVEL 6";
+                rankName = "TITÁN INQUEBRANTABLE";
                 avatarImg = "nivel6.png";
             } else if (globalPercent > 66) {
                 currentLevel = 5;
-                rankName = "NIVEL 5";
+                rankName = "MAESTRO DE LA DISCIPLINA";
                 avatarImg = "nivel5.png";
             } else if (globalPercent > 50) {
                 currentLevel = 4;
-                rankName = "NIVEL 4";
+                rankName = "GUERRERO EN ASCENSO";
                 avatarImg = "nivel4.png";
             } else if (globalPercent > 33) {
                 currentLevel = 3;
-                rankName = "NIVEL 3";
+                rankName = "DISCÍPULO DE HIERRO";
                 avatarImg = "nivel3.png";
             } else if (globalPercent > 16) {
                 currentLevel = 2;
-                rankName = "NIVEL 2";
+                rankName = "BUSCADOR DE GLORIA";
                 avatarImg = "nivel2.png";
             } else {
                 currentLevel = 1;
-                rankName = "NIVEL 1";
+                rankName = "INICIADO";
                 avatarImg = "nivel1.png";
             }
 
             document.getElementById('rankTitle').innerText = rankName;
             document.getElementById('rankAvatarImg').src = avatarImg;
-            document.getElementById('globalProgressText').innerText = `NIVEL ${currentLevel} (${globalPercent}%)`;
+            document.getElementById('globalProgressText').innerText = `${rankName} (${globalPercent}%)`;
 
             renderVisualReports(habitStats, dayCompletedCount, dayActiveCount);
         }
@@ -1359,7 +1362,7 @@
             renderTable();
         }
 
-        // Inicialización automática utilizando la fecha real actual del sistema (Hoy)
+        // Inicialización exacta con el día de hoy (23 de julio de 2026) asegurando su semana correspondiente
         const today = new Date();
         currentWeekKey = getWeekKey(today);
         document.getElementById('calendarInput').value = today.toISOString().split('T')[0];
