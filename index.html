@@ -291,7 +291,7 @@
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            min-width: 1000px;
+            min-width: 1050px;
         }
 
         th, td {
@@ -313,7 +313,7 @@
         th.th-left { text-align: left; padding-left: 20px; }
 
         .col-time { width: 110px; text-align: center; }
-        .col-habit { width: 280px; min-width: 250px; }
+        .col-habit { width: 310px; min-width: 280px; }
         .col-meta { width: 140px; text-align: center; }
         .col-day { width: 85px; text-align: center; }
         .col-progress { width: 110px; text-align: center; }
@@ -369,7 +369,7 @@
             flex-direction: column;
             align-items: center;
             gap: 2px;
-            min-height: 40px;
+            min-height: 42px;
             justify-content: flex-start;
         }
 
@@ -1194,29 +1194,26 @@
             let rankName = "INICIADO";
             let avatarImg = "nivel1.png";
 
+            // Lógica estricta: la imagen 6 (nivel 6) solo aparece cuando el progreso global es exacto al 100%
             if (globalPercent === 100 && totalPossible > 0) {
                 currentLevel = 6;
                 rankName = "BMF CHAMPION 🏆";
                 avatarImg = "nivel6.png";
-            } else if (globalPercent > 83) {
-                currentLevel = 6;
-                rankName = "TITÁN INQUEBRANTABLE";
-                avatarImg = "nivel6.png";
-            } else if (globalPercent > 66) {
+            } else if (globalPercent >= 84) {
                 currentLevel = 5;
-                rankName = "MAESTRO DE LA DISCIPLINA";
+                rankName = "TITÁN INQUEBRANTABLE";
                 avatarImg = "nivel5.png";
-            } else if (globalPercent > 50) {
+            } else if (globalPercent >= 67) {
                 currentLevel = 4;
-                rankName = "GUERRERO EN ASCENSO";
+                rankName = "MAESTRO DE LA DISCIPLINA";
                 avatarImg = "nivel4.png";
-            } else if (globalPercent > 33) {
+            } else if (globalPercent >= 50) {
                 currentLevel = 3;
-                rankName = "DISCÍPULO DE HIERRO";
+                rankName = "GUERRERO EN ASCENSO";
                 avatarImg = "nivel3.png";
-            } else if (globalPercent > 16) {
+            } else if (globalPercent >= 20) {
                 currentLevel = 2;
-                rankName = "BUSCADOR DE GLORIA";
+                rankName = "DISCÍPULO DE HIERRO";
                 avatarImg = "nivel2.png";
             } else {
                 currentLevel = 1;
@@ -1362,10 +1359,13 @@
             renderTable();
         }
 
-        // Inicialización exacta con el día de hoy (23 de julio de 2026) asegurando su semana correspondiente
-        const today = new Date();
+        // Forzar inicialización automática utilizando la fecha exacta de hoy en Lima, Perú (23 de julio de 2026)
+        const peruFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima', year: 'numeric', month: '2-digit', day: '2-digit' });
+        const todayStr = peruFormatter.format(new Date()); // Retorna formato YYYY-MM-DD ajustado a Perú
+        const today = new Date(todayStr + 'T00:00:00');
+
         currentWeekKey = getWeekKey(today);
-        document.getElementById('calendarInput').value = today.toISOString().split('T')[0];
+        document.getElementById('calendarInput').value = todayStr;
         
         initCloudSync();
         updateViewByCurrentWeek(today);
