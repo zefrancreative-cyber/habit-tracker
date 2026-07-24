@@ -383,7 +383,6 @@
             font-weight: 500;
         }
 
-        /* Insignia de Día Conquistado debajo del nombre del día */
         .day-conquest-badge {
             font-size: 8px;
             font-family: var(--font-roman);
@@ -1176,7 +1175,7 @@
                 tbody.appendChild(tr);
             });
 
-            // Verificar medallas de día conquistado (100% de hábitos activos completados en el día)
+            // Insignia de Día Conquistado (100% completado)
             for (let d = 0; d < 7; d++) {
                 const badgeContainer = document.getElementById(`badge-${d}`);
                 badgeContainer.innerHTML = '';
@@ -1190,32 +1189,40 @@
 
             let currentLevel = 1;
             let rankName = "NIVEL 1";
+            let avatarImg = "nivel1.png";
 
             if (globalPercent === 100 && totalPossible > 0) {
                 currentLevel = 6;
                 rankName = "BMF CHAMPION 🏆";
+                avatarImg = "nivel6.png"; // Cambio automático a imagen 6 al completar el 100%
             } else if (globalPercent > 83) {
                 currentLevel = 6;
                 rankName = "NIVEL 6";
+                avatarImg = "nivel6.png";
             } else if (globalPercent > 66) {
                 currentLevel = 5;
                 rankName = "NIVEL 5";
+                avatarImg = "nivel5.png";
             } else if (globalPercent > 50) {
                 currentLevel = 4;
                 rankName = "NIVEL 4";
+                avatarImg = "nivel4.png";
             } else if (globalPercent > 33) {
                 currentLevel = 3;
                 rankName = "NIVEL 3";
+                avatarImg = "nivel3.png";
             } else if (globalPercent > 16) {
                 currentLevel = 2;
                 rankName = "NIVEL 2";
+                avatarImg = "nivel2.png";
             } else {
                 currentLevel = 1;
                 rankName = "NIVEL 1";
+                avatarImg = "nivel1.png";
             }
 
             document.getElementById('rankTitle').innerText = rankName;
-            document.getElementById('rankAvatarImg').src = `nivel${currentLevel}.png`;
+            document.getElementById('rankAvatarImg').src = avatarImg;
             document.getElementById('globalProgressText').innerText = `NIVEL ${currentLevel} (${globalPercent}%)`;
 
             renderVisualReports(habitStats, dayCompletedCount, dayActiveCount);
@@ -1352,6 +1359,7 @@
             renderTable();
         }
 
+        // Inicialización automática utilizando la fecha real actual del sistema (Hoy)
         const today = new Date();
         currentWeekKey = getWeekKey(today);
         document.getElementById('calendarInput').value = today.toISOString().split('T')[0];
