@@ -6,7 +6,7 @@
     <title>Imperium Habit Tracker — Enterprise Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SDKs de Firebase (Database y Authentication) -->
+    <!-- SDKs de Firebase Compatibles para HTML -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -876,9 +876,18 @@
     </div>
 
     <script>
+        // CONFIGURACIÓN OFICIAL DE FIREBASE (Tus credenciales reales)
         const firebaseConfig = {
-            databaseURL: "https://imperium-tracker-default-rtdb.firebaseio.com"
+            apiKey: "AIzaSyAalE-lY8hvtl2dEN4bFS8ZPfX53fYGy8k",
+            authDomain: "imperium-tracker.firebaseapp.com",
+            databaseURL: "https://imperium-tracker-default-rtdb.firebaseio.com",
+            projectId: "imperium-tracker",
+            storageBucket: "imperium-tracker.firebasestorage.app",
+            messagingSenderId: "962919616666",
+            appId: "1:962919616666:web:51d29f404bf3d8ce914f23",
+            measurementId: "G-X7HK1MFVJT"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
