@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imperium Habit Tracker — Elite Sapphire Edition</title>
+    <title>Imperium Habit Tracker — Enterprise Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SDKs de Firebase -->
+    <!-- SDKs de Firebase (Database y Authentication) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -43,6 +44,91 @@
             justify-content: center;
             min-height: 100vh;
             background-image: radial-gradient(circle at 50% 0%, #0d1b3e 0%, #040812 70%);
+        }
+
+        /* --- Pantalla de Autenticación / Login --- */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(4, 8, 18, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-gold);
+            border-radius: 16px;
+            padding: 35px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .auth-title {
+            font-family: var(--font-roman);
+            color: var(--text-gold);
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            font-weight: 900;
+        }
+
+        .auth-input {
+            background: #040812;
+            border: 1px solid var(--border-primary);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            padding: 12px 16px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        .auth-input:focus { border-color: var(--accent-blue-neon); }
+
+        .auth-btn {
+            font-family: var(--font-roman);
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-login {
+            background: var(--accent-blue-bright);
+            color: #fff;
+        }
+        .btn-login:hover { background: var(--accent-blue-neon); }
+
+        .btn-register {
+            background: transparent;
+            color: var(--text-gold);
+            border: 1px solid var(--border-gold);
+        }
+        .btn-register:hover { background: rgba(212, 175, 55, 0.1); }
+
+        .btn-google {
+            background: #ffffff;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .tracker-wrapper {
@@ -123,11 +209,34 @@
             color-scheme: dark;
         }
 
+        .user-account-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-subtle);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn-account-action {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-family: var(--font-roman);
+            font-size: 0.7rem;
+            font-weight: 700;
+            transition: opacity 0.2s;
+        }
+        .btn-account-action:hover { opacity: 0.8; text-decoration: underline; }
+
         .categories-wrapper {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            margin-top: 20px;
+            margin-top: 15px;
             align-items: center;
         }
 
@@ -152,9 +261,7 @@
             cursor: pointer;
             font-size: 11px;
             opacity: 0.7;
-            transition: opacity 0.2s;
         }
-        .chip-delete:hover { opacity: 1; }
 
         .add-category-inline {
             display: flex;
@@ -174,9 +281,7 @@
             font-size: 0.7rem;
             outline: none;
             width: 100px;
-            letter-spacing: 0.5px;
         }
-        .inline-input-category::placeholder { color: var(--text-muted); }
 
         .inline-select-color {
             background: #040812;
@@ -200,9 +305,7 @@
             padding: 4px 10px;
             border-radius: 12px;
             cursor: pointer;
-            transition: background 0.2s;
         }
-        .btn-inline-submit:hover { background: var(--accent-blue-neon); }
 
         .elite-rank-card {
             background: var(--surface-dark);
@@ -261,7 +364,6 @@
             height: 12px;
             overflow: hidden;
             border: 1px solid var(--border-primary);
-            position: relative;
         }
 
         .elite-progress-fill {
@@ -331,9 +433,8 @@
             width: 95px;
             text-align: center;
             outline: none;
-            transition: border-color 0.2s;
+            color-scheme: dark;
         }
-        .inline-input-time:focus { border-color: var(--accent-blue-neon); color: var(--text-main); }
 
         .inline-input-habit {
             background: #040812;
@@ -346,10 +447,7 @@
             border-radius: 6px;
             width: 100%;
             outline: none;
-            letter-spacing: 0.5px;
-            transition: border-color 0.2s;
         }
-        .inline-input-habit:focus { border-color: var(--accent-blue-neon); }
 
         .inline-select-meta {
             background: #040812;
@@ -420,7 +518,6 @@
             justify-content: center;
             transition: all 0.2s ease;
         }
-        .roman-checkbox:hover { border-color: var(--accent-blue-neon); }
         .roman-checkbox:checked {
             background-color: var(--accent-blue-bright);
             border-color: var(--accent-blue-bright);
@@ -443,10 +540,6 @@
             display: inline-flex;
             align-items: center;
             cursor: pointer;
-            font-size: 9px;
-            font-family: var(--font-roman);
-            color: var(--text-muted);
-            gap: 3px;
         }
 
         .day-switch-input {
@@ -458,7 +551,6 @@
             position: relative;
             cursor: pointer;
             outline: none;
-            transition: background 0.2s;
         }
         .day-switch-input:checked { background: var(--accent-blue-bright); }
         .day-switch-input::before {
@@ -494,14 +586,12 @@
             background: linear-gradient(90deg, #1d4ed8, var(--accent-blue-neon));
             height: 100%;
             width: 0%;
-            transition: width 0.3s ease;
         }
 
         .row-stats-text {
             font-family: var(--font-roman);
             font-size: 10px;
             color: var(--text-muted);
-            letter-spacing: 0.5px;
         }
 
         .rank-achieved-badge {
@@ -512,7 +602,6 @@
             padding: 2px 6px;
             border-radius: 3px;
             border: 1px solid var(--accent-blue-bright);
-            letter-spacing: 1px;
         }
 
         .btn-delete-row {
@@ -521,12 +610,8 @@
             color: #f87171;
             cursor: pointer;
             font-size: 14px;
-            font-weight: bold;
             padding: 5px;
-            border-radius: 4px;
-            transition: background 0.2s;
         }
-        .btn-delete-row:hover { background: rgba(248, 113, 113, 0.15); }
 
         .footer-actions {
             display: flex;
@@ -544,7 +629,6 @@
             border-radius: 8px;
             cursor: pointer;
             border: 1px solid;
-            transition: all 0.2s ease;
         }
 
         .btn-reset {
@@ -552,7 +636,6 @@
             color: var(--text-muted);
             border-color: var(--border-primary);
         }
-        .btn-reset:hover { border-color: var(--text-main); color: var(--text-main); }
 
         .btn-primary-add {
             background: var(--accent-blue-bright);
@@ -560,7 +643,6 @@
             border-color: var(--accent-blue-bright);
             box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
         }
-        .btn-primary-add:hover { background: #2563eb; border-color: #2563eb; }
 
         .reports-grid {
             display: grid;
@@ -577,7 +659,6 @@
             border: 1px solid var(--border-primary);
             border-radius: 14px;
             padding: 20px;
-            box-shadow: 0 10px 40px rgba(4, 8, 18, 0.8);
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -599,7 +680,6 @@
             flex-direction: column;
             gap: 6px;
             padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.01);
             border-bottom: 1px solid var(--border-subtle);
         }
 
@@ -625,8 +705,6 @@
             height: 100%;
             background: linear-gradient(90deg, #1d4ed8, var(--accent-blue-neon));
             width: 0%;
-            transition: width 0.4s ease;
-            border-radius: 4px;
         }
 
         .vertical-chart-container {
@@ -664,16 +742,12 @@
             width: 100%;
             background: linear-gradient(180deg, #1d4ed8, var(--accent-blue-neon));
             height: 0%;
-            transition: height 0.4s ease;
-            border-radius: 4px 4px 0 0;
         }
 
         .v-bar-label {
             font-family: var(--font-roman);
             font-size: 9px;
             color: var(--text-muted);
-            letter-spacing: 0.5px;
-            text-align: center;
         }
 
         .v-bar-value {
@@ -686,7 +760,25 @@
 </head>
 <body>
 
-    <div class="tracker-wrapper">
+    <!-- Ventana Modal de Inicio de Sesión / Registro -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <div class="auth-title">IMPERIUM TRACKER</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Inicia sesión para acceder a tu imperio de hábitos privados en la nube.</p>
+            
+            <input type="email" id="authEmail" class="auth-input" placeholder="Correo electrónico">
+            <input type="password" id="authPassword" class="auth-input" placeholder="Contraseña">
+            
+            <button class="auth-btn btn-login" onclick="loginWithEmail()">INICIAR SESIÓN</button>
+            <button class="auth-btn btn-register" onclick="registerWithEmail()">CREAR MI CUENTA</button>
+            <button class="auth-btn btn-google" onclick="loginWithGoogle()">
+                <span>🌐 Continuar con Google</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenido Principal de la App -->
+    <div class="tracker-wrapper" id="appContent" style="display: none;">
         <div class="header-grid">
             <div class="control-panel">
                 <div class="top-banner-row">
@@ -715,6 +807,14 @@
                             <option value="#8b5cf6,#c4b5fd">Amatista Real</option>
                         </select>
                         <button class="btn-inline-submit" onclick="addCategoryInline()">+ AÑADIR</button>
+                    </div>
+                </div>
+
+                <div class="user-account-bar">
+                    <span>Usuario: <strong id="userEmailDisplay" style="color:var(--text-gold);">...</strong></span>
+                    <div>
+                        <button class="btn-account-action" style="color:var(--text-muted); margin-right: 15px;" onclick="logout()">Cerrar Sesión 🔒</button>
+                        <button class="btn-account-action" onclick="deleteAccount()">Eliminar Cuenta 🗑️</button>
                     </div>
                 </div>
             </div>
@@ -781,15 +881,79 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const auth = firebase.auth();
 
         const monthsNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
         let currentWeekKey = "";
         let weeksData = {};
         let customCategories = [];
         let isCloudLoaded = false;
+        let currentUser = null;
 
+        // --- Sistema de Autenticación de Firebase ---
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('appContent').style.display = 'flex';
+                document.getElementById('userEmailDisplay').innerText = user.email || "Usuario Imperium";
+                
+                // Inicializar fecha estricta Lima, Perú
+                const peruFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima', year: 'numeric', month: '2-digit', day: '2-digit' });
+                const todayStr = peruFormatter.format(new Date());
+                const today = new Date(todayStr + 'T00:00:00');
+
+                currentWeekKey = getWeekKey(today);
+                document.getElementById('calendarInput').value = todayStr;
+
+                initCloudSync();
+                updateViewByCurrentWeek(today);
+            } else {
+                currentUser = null;
+                document.getElementById('authOverlay').style.display = 'flex';
+                document.getElementById('appContent').style.display = 'none';
+            }
+        });
+
+        function loginWithEmail() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            if (!email || !password) return alert("Por favor escribe tu correo y contraseña.");
+            auth.signInWithEmailAndPassword(email, password).catch(err => alert("Error al acceder: " + err.message));
+        }
+
+        function registerWithEmail() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            if (!email || !password) return alert("Por favor escribe tu correo y contraseña.");
+            auth.createUserWithEmailAndPassword(email, password).catch(err => alert("Error al registrarse: " + err.message));
+        }
+
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(err => alert("Error con Google: " + err.message));
+        }
+
+        function logout() {
+            auth.signOut();
+        }
+
+        function deleteAccount() {
+            if (confirm("¿Estás seguro de que deseas eliminar tu cuenta y TODOS tus hábitos almacenados en la nube? Esta acción es irreversible.")) {
+                if (currentUser) {
+                    db.ref('users/' + currentUser.uid).remove().then(() => {
+                        currentUser.delete().then(() => {
+                            alert("Tu cuenta y tus datos han sido borrados de la nube.");
+                        }).catch(err => alert("Debes volver a iniciar sesión para borrar la cuenta por seguridad: " + err.message));
+                    });
+                }
+            }
+        }
+
+        // --- Sincronización Privada por Usuario ---
         function initCloudSync() {
-            db.ref('tracker_data').on('value', (snapshot) => {
+            if (!currentUser) return;
+            db.ref('users/' + currentUser.uid + '/tracker_data').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     if (data.weeksData) weeksData = data.weeksData;
@@ -806,7 +970,7 @@
         }
 
         function saveToCloud() {
-            if (!isCloudLoaded) return;
+            if (!isCloudLoaded || !currentUser) return;
             
             const chips = document.querySelectorAll('#categoriesContainer .category-chip');
             let cats = [];
@@ -819,7 +983,7 @@
             });
             customCategories = cats;
 
-            db.ref('tracker_data').set({
+            db.ref('users/' + currentUser.uid + '/tracker_data').set({
                 weeksData: weeksData,
                 customCategories: customCategories
             });
@@ -1194,7 +1358,7 @@
             let rankName = "INICIADO";
             let avatarImg = "nivel1.png";
 
-            // Lógica estricta: la imagen 6 (nivel 6) solo aparece cuando el progreso global es exacto al 100%
+            // Imagen nivel6.png estrictamente solo al llegar al 100%
             if (globalPercent === 100 && totalPossible > 0) {
                 currentLevel = 6;
                 rankName = "BMF CHAMPION 🏆";
@@ -1358,17 +1522,6 @@
             saveToCloud();
             renderTable();
         }
-
-        // Forzar inicialización automática utilizando la fecha exacta de hoy en Lima, Perú (23 de julio de 2026)
-        const peruFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima', year: 'numeric', month: '2-digit', day: '2-digit' });
-        const todayStr = peruFormatter.format(new Date()); // Retorna formato YYYY-MM-DD ajustado a Perú
-        const today = new Date(todayStr + 'T00:00:00');
-
-        currentWeekKey = getWeekKey(today);
-        document.getElementById('calendarInput').value = todayStr;
-        
-        initCloudSync();
-        updateViewByCurrentWeek(today);
     </script>
 </body>
 </html>
